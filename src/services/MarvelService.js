@@ -24,6 +24,7 @@ class MarvelService {
 
     _transformCharData = (char) => {
         let descr = char.description ? char.description : 'There is no description for this character';
+
         if (descr.length > 210) {
             let i = 209;
             while (/\d|\w/i.test(descr[i])) {
@@ -31,6 +32,7 @@ class MarvelService {
             }
             descr = descr.slice(0, i) + '...';
         }
+        
         return {
             name: char.name,
             description: descr,
