@@ -1,31 +1,27 @@
-class MarvelService {
-    _apiBase = 'https://gateway.marvel.com:443/v1/public/';
-    _apiKey = 'apikey=da44da8e8cc8adedfe8c0ce3bc6ea446';
-    _baseOffsetChar = 200;
+import { useHttp } from '../hooks/http.hook';
 
-    getData = async (url) => {
-        const result = await fetch(url);
+const useMarvelService = () => {
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
+    const _apiKey = 'apikey=da44da8e8cc8adedfe8c0ce3bc6ea446';
+    const _baseOffsetChar = 200;
 
-        if(!result.ok) {
-            throw new Error(`Couldn't fetch ${url}, status - ${result.status}`);
-        }
+    const {loading, error, request, resetError} = useHttp();
 
-        return await result.json();
-    }
-
-    getAllCharacters = async (offset = this._baseOffsetChar) => {
-        const allCharacters = await this.getData(`${this._apiBase}characters?limit=15&offset=${offset}&${this._apiKey}`);
+    const getAllCharacters = async (offset = _baseOffsetChar) => {
+        const allCharacters = await request(`${_apiBase}characters?limit=15&offset=${offset}&${_apiKey}`);
         //const withImg = allCharacters.data.results.forEach(item => console.log(!item.thumbnail.includes('image_not_available')));
         //console.log(withImg);
-        return allCharacters.data.results.map(this._transformCharData);
+
+        return allCharacters.data.results.map(_transformCharData);
     }
 
-    getCharacter = async (id) => {
-        const char = await this.getData(`${this._apiBase}characters/${id}?${this._apiKey}`);
-        return this._transformCharData(char.data.results[0]);
+    const getCharacter = async (id) => {
+        const char = await request(`${_apiBase}characters/${id}?${_apiKey}`);
+
+        return _transformCharData(char.data.results[0]);
     }
 
-    _transformCharData = (char) => {
+    const _transformCharData = (char) => {
         let descr = char.description ? char.description : 'There is no description for this character';
 
         if (descr.length > 210) {
@@ -46,6 +42,8 @@ class MarvelService {
             comics: char.comics.items.slice(0, 10)
         }
     }
+
+    return {loading, error, getAllCharacters, getCharacter, resetError};
 }
 
-export default MarvelService;
+export default useMarvelService;
