@@ -4,15 +4,19 @@ const useMarvelService = () => {
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
     const _apiKey = 'apikey=da44da8e8cc8adedfe8c0ce3bc6ea446';
     const _baseOffsetChar = 200;
+    const _baseOffsetComics = 100;
 
     const {loading, error, request, resetError} = useHttp();
 
     const getAllCharacters = async (offset = _baseOffsetChar) => {
-        const allCharacters = await request(`${_apiBase}characters?limit=15&offset=${offset}&${_apiKey}`);
-        //const withImg = allCharacters.data.results.forEach(item => console.log(!item.thumbnail.includes('image_not_available')));
-        //console.log(withImg);
+        const allCharacters = await request(`${_apiBase}characters?limit=20&offset=${offset}&${_apiKey}`)
+            .then(response => {
+                    return response.data.results.filter(item => !item.thumbnail.path.includes('image_not_available') && !item.thumbnail.extension.includes('gif'));
+                })
+                .then(response => response.slice(0, 9))
+                .then(response => response.map(_transformCharData));
 
-        return allCharacters.data.results.map(_transformCharData);
+        return allCharacters;
     }
 
     const getCharacter = async (id) => {
@@ -43,7 +47,28 @@ const useMarvelService = () => {
         }
     }
 
-    return {loading, error, getAllCharacters, getCharacter, resetError};
+    const getAllComics = async (offset = _baseOffsetComics) => {
+        const allComics = await request(`${_apiBase}comics?issueNumber=1&limit=10&offset=${offset}&${_apiKey}`)
+            .then(response => {
+                return response.data.results.filter(item => !item.thumbnail.path.includes('image_not_available') && !item.thumbnail.extension.includes('gif'));
+            })
+            .then(response => response.slice(0, 8))
+            .then(response => response.map(_transformComicsData));
+        return allComics;
+    }
+
+    const _transformComicsData = (comics) => {
+        const {id, title, thumbnail, prices} = comics;
+
+        return {
+            id: id,
+            title: title,
+            thumbnail: `${thumbnail.path}.${thumbnail.extension}`,
+            price: prices[0].price
+        }
+    }
+
+    return {loading, error, getAllCharacters, getCharacter, resetError, getAllComics};
 }
 
 export default useMarvelService;

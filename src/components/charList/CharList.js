@@ -62,17 +62,15 @@ const CharList = (props) => {
     }
 
     const onListLoaded = (newCharsList) => {
-        const listEnded = newCharsList.length < 15 ? true : false;
+        const listEnded = newCharsList.length < 9 ? true : false;
         setCharsList(charsList => [...charsList, ...newCharsList]);
         setNewCharLoading(false);
-        setOffset(offset => offset + 15);
+        setOffset(offset => offset + 20);
         setListEnded(listEnded);
     }
 
     const renderItems = (arr) => {
-        const allItemsFiltered = arr.filter(item => !item.thumbnail.includes('image_not_available') &&
-            !item.thumbnail.includes('.gif'));
-        const items =  allItemsFiltered.map((item, index) => {
+        const items =  arr.map((item, index) => {
             return (
                 <li tabIndex={0}
                     ref={element => (charRef.current[index] = element)}
