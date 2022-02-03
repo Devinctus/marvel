@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import propTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
@@ -73,7 +74,9 @@ const RenderCharInfo = ({char}) => {
                     comics.map((item, index) => {
                         return (
                             <li key={index} className="char__comics-item">
-                                {item.name}
+                                <Link to={'/comics/' + item.resourceURI.slice(item.resourceURI.lastIndexOf('/') + 1)}>
+                                    {item.name}
+                                </Link>
                             </li>
                         )
                     })

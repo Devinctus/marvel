@@ -80,3 +80,20 @@ main {
         opacity: 1
     }
 }
+
+.page404 {
+    p {
+        text-align: center;
+        font-weight: bold;
+        font-size: 32px;
+        margin-top: 20px;
+    }
+    a {
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        font-size: 32px;
+        margin-top: 20px;
+        color: $main-color;
+    }
+}

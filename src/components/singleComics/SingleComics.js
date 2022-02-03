@@ -1,18 +1,62 @@
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+
+import useMarvelService from '../../services/MarvelService';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
+
 import './singleComics.scss';
-import xMen from '../../resources/img/x-men.png';
 
 const SingleComics = () => {
+    const {comicsId} = useParams();
+    const [comics, setComics] = useState(null);
+    const {loading, error, getComics, resetError} = useMarvelService();
+
+    useEffect(() => {
+        updateComics();
+    // eslint-disable-next-line
+    }, [comicsId]);
+
+    const updateComics = () => {
+        if(!comicsId) {
+            return;
+        }
+        resetError();
+        getComics(comicsId)
+            .then(onComicsLoaded);
+    }
+
+    const onComicsLoaded = (comics) => {
+        setComics(comics);
+    }
+
+    const spinner = loading ? <Spinner/> : null;
+    const errorMessage = error ? <ErrorMessage/> : null;
+    const content = !(loading || error || !comics) ? <RenderComicsInfo comics={comics}/> : null;
+
+    return (
+        <>
+            {spinner}
+            {errorMessage}
+            {content}
+        </>
+    )
+}
+
+const RenderComicsInfo = ({comics}) => {
+    const {title, description, pageCount, thumbnail, language, price} = comics;
+
     return (
         <div className="single-comics">
-            <img src={xMen} alt="X-men" className="single-comics__img"/>
+            <img src={thumbnail} alt={title} className="single-comics__img"/>
             <div className="single-comics__info">
-                <h2 className="single-comics__name">X-Men: Days of Future Past</h2>
-                <p className="single-comics__descr">Re-live the legendary first journey into the dystopian future of 2013 - where Sentinels stalk the Earth, and the X-Men are humanity's only hope...until they die! Also featuring the first appearance of Alpha Flight, the return of the Wendigo, the history of the X-Men from Cyclops himself...and a demon for Christmas!?</p>
-                <p className="single-comics__descr">144 pages</p>
-                <p className="single-comics__descr">Language: en-us</p>
-                <div className="single-comics__price">9.99$</div>
+                <h2 className="single-comics__name">{title}</h2>
+                <p className="single-comics__descr">{description}</p>
+                <p className="single-comics__descr">{pageCount}</p>
+                <p className="single-comics__descr">{language}</p>
+                <div className="single-comics__price">{price}</div>
             </div>
-            <a href="#" className='single-comics__back'>Back to all</a>
+            <Link to="/comics/" className='single-comics__back'>Back to All</Link>
         </div>
     )
 }

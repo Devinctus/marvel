@@ -6,7 +6,7 @@ const AppHeader = () => {
     return (
         <header className="app__header">
             <h1 className="app__title">
-                <Link exact to="/">
+                <Link to="/">
                     <span>Marvel</span> information portal
                 </Link>
                 </h1>
@@ -17,7 +17,7 @@ const AppHeader = () => {
                     </li>
                     /
                     <li>
-                        <NavLink exact to="/comics/" activeClassName="active-page">Comics</NavLink>
+                        <NavLink to="/comics/" activeClassName="active-page">Comics</NavLink>
                     </li>
                 </ul>
             </nav>
