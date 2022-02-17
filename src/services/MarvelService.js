@@ -25,6 +25,12 @@ const useMarvelService = () => {
         return _transformCharData(char.data.results[0]);
     }
 
+    const getCharacterByName = async (name) => {
+        const char = await request(`${_apiBase}characters?name=${name}&${_apiKey}`);
+        
+        return char.data.results[0] ? _transformCharData(char.data.results[0]) : null;
+    }
+
     const _transformCharData = (char) => {
         let descr = char.description ? char.description : 'There is no description for this character';
 
@@ -39,7 +45,8 @@ const useMarvelService = () => {
         return {
             id: char.id,
             name: char.name,
-            description: descr,
+            description: char.description,
+            shortDescr: descr,
             thumbnail: `${char.thumbnail.path}.${char.thumbnail.extension}`,
             homepage: char.urls[0].url,
             wiki: char.urls[1].url,
@@ -78,7 +85,7 @@ const useMarvelService = () => {
         }
     }
 
-    return {loading, error, getAllCharacters, getCharacter, resetError, getAllComics, getComics};
+    return {loading, error, getAllCharacters, getCharacter, getCharacterByName, resetError, getAllComics, getComics};
 }
 
 export default useMarvelService;

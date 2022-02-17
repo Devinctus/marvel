@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'; 
 import { Link } from 'react-router-dom';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
@@ -37,15 +38,17 @@ const ComicsList = () => {
     const renderItems = (arr) => {
         const items = arr.map((item) => {
             return (
-                <li tabIndex={0}
-                    className="comics__item"
-                    key={item.id}>
-                    <Link to={`/comics/${item.id}`}>
-                        <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
-                        <div className="comics__item-name">{item.title}</div>
-                        <div className="comics__item-price">{item.price}</div>
-                    </Link>
-                </li>
+                <CSSTransition key={item.id} timeout={500} classNames="comics__item">
+                    <li tabIndex={0}
+                        className="comics__item"
+                        key={item.id}>
+                        <Link to={`/comics/${item.id}`}>
+                            <img src={item.thumbnail} alt={item.title} className="comics__item-img"/>
+                            <div className="comics__item-name">{item.title}</div>
+                            <div className="comics__item-price">{item.price}</div>
+                        </Link>
+                    </li>
+                </CSSTransition>
             )
         });
         return items;
@@ -60,7 +63,9 @@ const ComicsList = () => {
             {spinner}
             {errorMessage}
             <ul className="comics__grid">
-                {items}
+                <TransitionGroup component={null}>
+                    {items}
+                </TransitionGroup>
             </ul>
             <button 
                 className="button button__main button__long"

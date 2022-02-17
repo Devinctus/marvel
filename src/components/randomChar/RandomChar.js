@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { CSSTransition } from 'react-transition-group';
 import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -8,6 +9,7 @@ import mjolnir from '../../resources/img/mjolnir.png'
 
 const RandomChar = () => {
     const [char, setChar] = useState(null);
+    const [showChar, setShowChar] = useState(false);
     const {loading, error, getCharacter, resetError} = useMarvelService();
 
     useEffect(() => {
@@ -24,6 +26,7 @@ const RandomChar = () => {
 
     const onCharLoaded = (char) => {
         setChar(char);
+        setShowChar(true);
     }
 
     const updateChar = () => {
@@ -35,7 +38,7 @@ const RandomChar = () => {
 
     const spinner = loading ? <Spinner/> : null;
     const errorMessage = error ? <ErrorMessage/> : null;
-    const content = !(loading || error || !char) ? <RenderRandomChar char={char}/> : null;
+    const content = !(loading || error || !char) ? <RenderRandomChar char={char} showChar={showChar}/> : null;
 
     return (
         <div className="randomchar">
@@ -50,7 +53,11 @@ const RandomChar = () => {
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button onClick={updateChar} className="button button__main">
+                <button onClick={() => {
+                    setShowChar(false);
+                    updateChar();
+                    }} 
+                    className="button button__main">
                     <div className="inner">Try it</div>
                 </button>
                 <img src={mjolnir} alt="Mjolnir" className='randomchar__decoration' />
@@ -59,25 +66,27 @@ const RandomChar = () => {
     )
 }
 
-const RenderRandomChar = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki} = char;
+const RenderRandomChar = ({char, showChar}) => {
+    const {name, shortDescr, thumbnail, homepage, wiki} = char;
     const style = thumbnail.includes('image_not_available') ? {objectFit: 'contain'} : {objectFit: 'cover'};
     return (
-        <div className="randomchar__block">
-            <img src={thumbnail} alt={name} className="randomchar__img" style={style}/>
-            <div className="randomchar__info">
-                <p className="randomchar__name">{name}</p>
-                <p className="randomchar__descr">{description}</p>
-                <div className="randomchar__btns">
-                    <a href={homepage} className="button button__main">
-                        <div className="inner">Homepage</div>
-                    </a>
-                    <a href={wiki} className="button button__secondary">
-                        <div className="inner">Wiki</div>
-                    </a>
+            <CSSTransition in={showChar} timeout={800} unmountOnExit classNames="randomchar__block">
+                <div className="randomchar__block">
+                    <img src={thumbnail} alt={name} className="randomchar__img" style={style}/>
+                    <div className="randomchar__info">
+                        <p className="randomchar__name">{name}</p>
+                        <p className="randomchar__descr">{shortDescr}</p>
+                        <div className="randomchar__btns">
+                            <a href={homepage} className="button button__main">
+                                <div className="inner">Homepage</div>
+                            </a>
+                            <a href={wiki} className="button button__secondary">
+                                <div className="inner">Wiki</div>
+                            </a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </CSSTransition>
     )
 } 
 

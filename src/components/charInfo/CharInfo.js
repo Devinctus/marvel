@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { CSSTransition } from 'react-transition-group';
 import propTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
@@ -11,10 +12,12 @@ import './charInfo.scss';
 
 const CharInfo = (props) => {
     const [char, setChar] = useState(null);
+    const [showChar, setShowChar] = useState(false);
 
     const {loading, error, getCharacter, resetError} = useMarvelService();
 
     useEffect(() => {
+        setShowChar(false);
         updateChar();
         // eslint-disable-next-line
     }, [props.charId]);
@@ -31,6 +34,7 @@ const CharInfo = (props) => {
 
     const onCharLoaded = (char) => {
         setChar(char);
+        setShowChar(true);
     }
 
     const skeleton = char || loading || error ? null : <Skeleton/>;
@@ -38,12 +42,14 @@ const CharInfo = (props) => {
     const errorMessage = error ? <ErrorMessage/> : null;
     const content = !(loading || error || !char) ? <RenderCharInfo char={char}/> : null;
     return (
-        <div className="char__info">
-            {skeleton}
-            {spinner}
-            {errorMessage}
-            {content}
-        </div>
+        <CSSTransition in={showChar} timeout={800} classNames="char__info">
+            <div className="char__info">
+                {skeleton}
+                {spinner}
+                {errorMessage}
+                {content}
+            </div>
+        </CSSTransition>
     )
 }
 
