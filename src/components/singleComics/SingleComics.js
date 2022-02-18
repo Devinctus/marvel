@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 import './singleComics.scss';
 
@@ -7,6 +8,10 @@ const SingleComics = ({content}) => {
 
     return (
         <div className="single-comics">
+            <Helmet>
+                <title>{`${title} Marvel comics book`}</title>
+                <meta name="description" content={description} />
+            </Helmet>
             <img src={thumbnail} alt={title} className="single-comics__img"/>
             <div className="single-comics__info">
                 <h2 className="single-comics__name">{title}</h2>

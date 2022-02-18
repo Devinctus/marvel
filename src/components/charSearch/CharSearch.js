@@ -9,12 +9,21 @@ import './charSearch.scss';
 
 const CharSearch = () => {
     const [char, setChar] = useState(undefined);
-    const {getCharacterByName, resetError} = useMarvelService();
+    const {loading, getCharacterByName, resetError} = useMarvelService();
 
     const updateChar = ({charName}) => {
+        console.log('update char');
         resetError();
         getCharacterByName(charName)
-            .then(response => setChar(response));
+            .then(response => {
+                console.log('set char');
+                    setChar(response);
+                    if (response === null) {
+                        setTimeout(() => {
+                            setChar(undefined);
+                        }, 7000);
+                    }
+                });
     }
     const content = char === undefined ? null : char ? 
         <div className="char__search-wrapper">
@@ -27,29 +36,39 @@ const CharSearch = () => {
             The character was not found!<br/>Check the name and try again
         </div>;
 
+    console.log('render CharSearch');
+
     return (
-        <div>
+        <div className="char__search-form">
             <Formik
                 initialValues={{charName: ''}}
                 validationSchema={Validate.object({
                     charName: Validate.string().min(3, 'Minimum 3 symbols required').required('This field is required')
                 })}
-                onSubmit={name => updateChar(name)}
+                onSubmit={(name, {resetForm}) => {
+                    updateChar(name);
+                    resetForm();
+                }}
             >
-                <Form className="char__search-form">
+                <Form>
                     <div className="char__search-label">Or find a character by name:</div>
                     <div className="char__search-wrapper">
-                        <Field name="charName" type="text" />
+                        <Field 
+                            name="charName" 
+                            type="text"
+                            id="charName"
+                            placeholder="Enter name" />
                         <button 
                             className="button button__main"
-                            type="submit">
+                            type="submit"
+                            disabled={loading}>
                             <div className="inner">Find</div>
                         </button>
                     </div>
                     <ErrorMessage name="charName" component="div" className="char__search-error" />
-                    {content}
                 </Form>
             </Formik>
+            {content}
         </div>
     )
 }

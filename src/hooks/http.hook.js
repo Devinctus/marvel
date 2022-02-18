@@ -27,6 +27,7 @@ export const useHttp = () => {
     }, []);
 
     const resetError = useCallback(() => setError(null), []);
+    //console.log('useHTTP');
 
     return {loading, error, request, resetError};
 }
