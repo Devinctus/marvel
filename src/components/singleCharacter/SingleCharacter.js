@@ -2,9 +2,9 @@ import { Helmet } from 'react-helmet';
 
 import './singleCharacter.scss';
 
-const SingleCharacter = ({content}) => {
+const SingleCharacter = ({data}) => {
 
-    const { name, description, thumbnail } = content;
+    const { name, description, thumbnail } = data;
 
     return (
         <div className="single-character">

@@ -4,9 +4,7 @@ import { CSSTransition } from 'react-transition-group';
 import propTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-import Skeleton from '../skeleton/Skeleton';
+import setContent from '../../utils/setContent';
 
 import './charInfo.scss';
 
@@ -14,7 +12,7 @@ const CharInfo = (props) => {
     const [char, setChar] = useState(null);
     const [showChar, setShowChar] = useState(false);
 
-    const {loading, error, getCharacter, resetError} = useMarvelService();
+    const {getCharacter, resetError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         setShowChar(false);
@@ -29,7 +27,8 @@ const CharInfo = (props) => {
         }
         resetError();
         getCharacter(charId)
-            .then(onCharLoaded);
+            .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onCharLoaded = (char) => {
@@ -37,24 +36,17 @@ const CharInfo = (props) => {
         setShowChar(true);
     }
 
-    const skeleton = char || loading || error ? null : <Skeleton/>;
-    const spinner = loading ? <Spinner/> : null;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const content = !(loading || error || !char) ? <RenderCharInfo char={char}/> : null;
     return (
         <CSSTransition in={showChar} timeout={800} classNames="char__info">
             <div className="char__info">
-                {skeleton}
-                {spinner}
-                {errorMessage}
-                {content}
+                {setContent(process, RenderCharInfo, char)}
             </div>
         </CSSTransition>
     )
 }
 
-const RenderCharInfo = ({char}) => {
-    const {name, description, thumbnail, homepage, wiki, comics} = char;
+const RenderCharInfo = ({data}) => {
+    const {name, description, thumbnail, homepage, wiki, comics} = data;
     return (
         <>
             <div className="char__basics">

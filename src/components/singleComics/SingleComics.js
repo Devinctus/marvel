@@ -3,8 +3,8 @@ import { Helmet } from 'react-helmet';
 
 import './singleComics.scss';
 
-const SingleComics = ({content}) => {
-    const {title, description, pageCount, thumbnail, language, price} = content;
+const SingleComics = ({data}) => {
+    const {title, description, pageCount, thumbnail, language, price} = data;
 
     return (
         <div className="single-comics">

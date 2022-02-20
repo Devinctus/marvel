@@ -9,12 +9,13 @@ import './charSearch.scss';
 
 const CharSearch = () => {
     const [char, setChar] = useState(undefined);
-    const {loading, getCharacterByName, resetError} = useMarvelService();
+    const {getCharacterByName, resetError, process, setProcess} = useMarvelService();
 
     const updateChar = ({charName}) => {
         console.log('update char');
         resetError();
         getCharacterByName(charName)
+            .then(() => setProcess('confirmed'))
             .then(response => {
                 console.log('set char');
                     setChar(response);
@@ -61,7 +62,7 @@ const CharSearch = () => {
                         <button 
                             className="button button__main"
                             type="submit"
-                            disabled={loading}>
+                            disabled={process === 'loading'}>
                             <div className="inner">Find</div>
                         </button>
                     </div>

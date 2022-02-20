@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { CSSTransition } from 'react-transition-group';
+
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png'
@@ -10,7 +10,7 @@ import mjolnir from '../../resources/img/mjolnir.png'
 const RandomChar = () => {
     const [char, setChar] = useState(null);
     const [showChar, setShowChar] = useState(false);
-    const {loading, error, getCharacter, resetError} = useMarvelService();
+    const {getCharacter, resetError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         updateChar();
@@ -33,18 +33,17 @@ const RandomChar = () => {
         const id = ~~(Math.random() * (1011400 - 1011000) + 1011000);
         resetError();
         getCharacter(id)
-            .then(onCharLoaded);
+            .then(onCharLoaded)
+            .then(() => setProcess('confirmed'));
     }
-
-    const spinner = loading ? <Spinner/> : null;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const content = !(loading || error || !char) ? <RenderRandomChar char={char} showChar={showChar}/> : null;
 
     return (
         <div className="randomchar">
-            {errorMessage}
-            {spinner}
-            {content}
+            <CSSTransition in={showChar} timeout={800} unmountOnExit classNames="randomchar__block">
+                <div className="randomchar__csstransition">
+                    {setContent(process, RenderRandomChar, char)}
+                </div>
+            </CSSTransition>
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br />
@@ -66,27 +65,25 @@ const RandomChar = () => {
     )
 }
 
-const RenderRandomChar = ({char, showChar}) => {
-    const {name, shortDescr, thumbnail, homepage, wiki} = char;
+const RenderRandomChar = ({data}) => {
+    const {name, shortDescr, thumbnail, homepage, wiki} = data;
     const style = thumbnail.includes('image_not_available') ? {objectFit: 'contain'} : {objectFit: 'cover'};
     return (
-            <CSSTransition in={showChar} timeout={800} unmountOnExit classNames="randomchar__block">
-                <div className="randomchar__block">
-                    <img src={thumbnail} alt={name} className="randomchar__img" style={style}/>
-                    <div className="randomchar__info">
-                        <p className="randomchar__name">{name}</p>
-                        <p className="randomchar__descr">{shortDescr}</p>
-                        <div className="randomchar__btns">
-                            <a href={homepage} className="button button__main">
-                                <div className="inner">Homepage</div>
-                            </a>
-                            <a href={wiki} className="button button__secondary">
-                                <div className="inner">Wiki</div>
-                            </a>
-                        </div>
+            <div className="randomchar__block">
+                <img src={thumbnail} alt={name} className="randomchar__img" style={style}/>
+                <div className="randomchar__info">
+                    <p className="randomchar__name">{name}</p>
+                    <p className="randomchar__descr">{shortDescr}</p>
+                    <div className="randomchar__btns">
+                        <a href={homepage} className="button button__main">
+                            <div className="inner">Homepage</div>
+                        </a>
+                        <a href={wiki} className="button button__secondary">
+                            <div className="inner">Wiki</div>
+                        </a>
                     </div>
                 </div>
-            </CSSTransition>
+            </div>
     )
 } 
 

@@ -3,8 +3,8 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import propTypes from 'prop-types';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
+
 import './charList.scss';
 
 const CharList = (props) => {
@@ -16,7 +16,7 @@ const CharList = (props) => {
     const [activeChar, setActiveChar] = useState(null);
 
 
-    const {loading, error, getAllCharacters} = useMarvelService();
+    const {getAllCharacters, process, setProcess} = useMarvelService();
     const charRef = useRef([]);
     const prevCharRef = useRef(activeChar);
 
@@ -59,7 +59,8 @@ const CharList = (props) => {
     const onRequestNewChars = (offset, initial) => {
         initial ? setNewCharLoading(false) : setNewCharLoading(true);
         getAllCharacters(offset)
-            .then(onListLoaded);
+            .then(onListLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onListLoaded = (newCharsList) => {
@@ -99,17 +100,11 @@ const CharList = (props) => {
         return items;
     }
 
-    const spinner = loading && !newCharLoading ? <Spinner/> : null;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const items = renderItems(charsList);
-
     return (
         <div className="char__list">
-            {spinner}
-            {errorMessage}
             <ul className="char__grid">
                 <TransitionGroup component={null}>
-                    {items}
+                    {setContent(process, () => renderItems(charsList), null, newCharLoading)}
                 </TransitionGroup>
             </ul>
             <button 

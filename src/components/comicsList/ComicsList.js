@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import useMarvelService from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import './comicsList.scss';
 
@@ -13,7 +12,7 @@ const ComicsList = () => {
     const [newComicsLoading, setNewComicsLoading] = useState(false);
     const [offset, setOffset] = useState(200);
     const [listEnded, setListEnded] = useState(false);
-    const {loading, error, getAllComics, resetError} = useMarvelService();
+    const {getAllComics, resetError, process, setProcess} = useMarvelService();
 
     useEffect(() => {
         onRequestNewComics(offset, true);
@@ -24,7 +23,8 @@ const ComicsList = () => {
         initial ? setNewComicsLoading(false) : setNewComicsLoading(true);
         resetError();
         getAllComics(offset)
-            .then(onListLoaded);
+            .then(onListLoaded)
+            .then(() => setProcess('confirmed'));
     }
 
     const onListLoaded = (newComicsList) => {
@@ -54,17 +54,11 @@ const ComicsList = () => {
         return items;
     }
 
-    const spinner = loading && !newComicsLoading ? <Spinner/> : null;
-    const errorMessage = error ? <ErrorMessage/> : null;
-    const items = renderItems(comicsList);
-
     return (
         <div className="comics__list">
-            {spinner}
-            {errorMessage}
             <ul className="comics__grid">
                 <TransitionGroup component={null}>
-                    {items}
+                    {setContent(process, () => renderItems(comicsList), null, newComicsLoading)}
                 </TransitionGroup>
             </ul>
             <button 
