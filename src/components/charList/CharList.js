@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import propTypes from 'prop-types';
 
@@ -100,11 +100,16 @@ const CharList = (props) => {
         return items;
     }
 
+    const elements = useMemo(() => {
+        return setContent(process, () => renderItems(charsList), null, newCharLoading);
+        // eslint-disable-next-line
+    }, [process]);
+
     return (
         <div className="char__list">
             <ul className="char__grid">
                 <TransitionGroup component={null}>
-                    {setContent(process, () => renderItems(charsList), null, newCharLoading)}
+                    {elements}
                 </TransitionGroup>
             </ul>
             <button 

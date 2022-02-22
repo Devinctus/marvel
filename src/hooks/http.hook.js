@@ -26,7 +26,6 @@ export const useHttp = () => {
     const resetError = useCallback(() => {
         setProcess('loading');
     }, []);
-    console.log('useHTTP');
 
     return {request, resetError, process, setProcess};
 }

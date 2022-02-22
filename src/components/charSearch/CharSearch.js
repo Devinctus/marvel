@@ -12,12 +12,10 @@ const CharSearch = () => {
     const {getCharacterByName, resetError, process, setProcess} = useMarvelService();
 
     const updateChar = ({charName}) => {
-        console.log('update char');
         resetError();
         getCharacterByName(charName)
             .then(() => setProcess('confirmed'))
             .then(response => {
-                console.log('set char');
                     setChar(response);
                     if (response === null) {
                         setTimeout(() => {
@@ -36,8 +34,6 @@ const CharSearch = () => {
         <div className="char__search-error">
             The character was not found!<br/>Check the name and try again
         </div>;
-
-    console.log('render CharSearch');
 
     return (
         <div className="char__search-form">
